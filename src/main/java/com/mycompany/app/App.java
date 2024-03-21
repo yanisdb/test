@@ -1,31 +1,25 @@
 package com.mycompany.app;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 
-public class App
-{
- public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your username: ");
-        String username = scanner.nextLine();
+public class App {
 
-        try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", "root", "password");
-            Statement statement = connection.createStatement();
+    public static void main(String[] args) {
+        // The file 'example.obj' is assumed to contain a serialized Java object
+        String filename = "example.obj";
 
-            // Vulnerable to SQL Injection
-            String query = "SELECT * FROM users WHERE username = '" + username + "'";
-            statement.executeQuery(query);
+        try (FileInputStream fileInputStream = new FileInputStream(filename);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
 
-            System.out.println("Query executed successfully.");
+            // Deserializing object without any validation
+            Object obj = objectInputStream.readObject();
+
+            // Normally, you would do something with the object here
+            System.out.println("Deserialized object: " + obj);
+
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            scanner.close();
         }
     }
 }
